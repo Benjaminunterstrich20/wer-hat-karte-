@@ -1,0 +1,40 @@
+!DOCTYPE html>
+messagingSenderId: "HIER_EINSETZEN",
+appId: "HIER_EINSETZEN"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const ownerRef = ref(db, "kartenbesitzer/owner");
+
+
+if (Notification.permission !== "granted") {
+Notification.requestPermission();
+}
+
+
+onValue(ownerRef, (snapshot) => {
+const data = snapshot.val();
+const current = document.getElementById('owner-name').textContent;
+document.getElementById('owner-name').textContent = data || "-";
+
+
+if (data && data !== current) {
+if (Notification.permission === "granted") {
+new Notification("Kartenbesitzer geändert", {
+body: `${data} hat jetzt die Karte.`
+});
+}
+}
+});
+
+
+window.updateOwner = function () {
+const selected = document.getElementById('new-owner').value;
+set(ownerRef, selected);
+};
+</script>
+</body>
+</html>
+```
