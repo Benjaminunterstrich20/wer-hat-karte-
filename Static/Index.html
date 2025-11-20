@@ -28,6 +28,7 @@ Aktueller Kartenbesitzer: <strong id="owner-name">-</strong>
 const ownerName = document.getElementById('owner-name');
 const select = document.getElementById('new-owner');
 
+// Aktuellen Besitzer laden
 async function loadOwner() {
   try {
     const res = await fetch('/owner');
@@ -37,6 +38,7 @@ async function loadOwner() {
   } catch(e){ console.error(e); }
 }
 
+// Besitzer ändern
 async function updateOwner() {
   const newOwner = select.value;
   await fetch('/owner', {
