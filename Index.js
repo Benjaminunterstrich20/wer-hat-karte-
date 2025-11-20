@@ -5,22 +5,24 @@ const app = express();
 app.use(express.json());
 app.use(express.static("static")); // liefert index.html aus
 
-// GET aktueller Besitzer
+const file = "owner.json";
+
+// GET: aktuellen Besitzer holen
 app.get("/owner", (req, res) => {
-  const owner = JSON.parse(fs.readFileSync("owner.json", "utf8"));
-  res.send(owner);
+  const data = JSON.parse(fs.readFileSync(file, "utf8"));
+  res.send(data);
 });
 
-// POST neuer Besitzer
+// POST: Besitzer ändern
 app.post("/owner", (req, res) => {
-  if(req.body.owner && ["Semmel","Emmel","Bemmel","Jemmel"].includes(req.body.owner)){
-    fs.writeFileSync("owner.json", JSON.stringify({owner: req.body.owner}));
+  const { owner } = req.body;
+  if (["Semmel","Emmel","Bemmel","Jemmel"].includes(owner)) {
+    fs.writeFileSync(file, JSON.stringify({ owner }));
     res.send({ status: "ok" });
   } else {
     res.status(400).send({ status: "error", msg: "Ungültiger Besitzer" });
   }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Server läuft auf Port", process.env.PORT || 3000);
-});
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server läuft auf Port ${port}`));
