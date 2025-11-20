@@ -1,40 +1,37 @@
-!DOCTYPE html>
-messagingSenderId: "HIER_EINSETZEN",
-appId: "HIER_EINSETZEN"
-};
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kartenbesitzer</title>
+  <style>
+    body { display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f0f0; font-family:Arial,sans-serif; }
+    .card { background:white; padding:40px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); text-align:center; font-size:2rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    Aktueller Kartenbesitzer: <strong id="owner-name">-</strong>
+  </div>
 
+  <script>
+    // URL zu deiner JSON-Datei
+    const jsonURL = 'https://gist.githubusercontent.com/DEIN_USERNAME/DEIN_GIST_ID/raw/owner.json';
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const ownerRef = ref(db, "kartenbesitzer/owner");
+    async function loadOwner() {
+      try {
+        const response = await fetch(jsonURL);
+        const data = await response.json();
+        document.getElementById('owner-name').textContent = data.owner;
+      } catch (err) {
+        console.error('Fehler beim Laden des Besitzers:', err);
+      }
+    }
 
+    loadOwner();
 
-if (Notification.permission !== "granted") {
-Notification.requestPermission();
-}
-
-
-onValue(ownerRef, (snapshot) => {
-const data = snapshot.val();
-const current = document.getElementById('owner-name').textContent;
-document.getElementById('owner-name').textContent = data || "-";
-
-
-if (data && data !== current) {
-if (Notification.permission === "granted") {
-new Notification("Kartenbesitzer geändert", {
-body: `${data} hat jetzt die Karte.`
-});
-}
-}
-});
-
-
-window.updateOwner = function () {
-const selected = document.getElementById('new-owner').value;
-set(ownerRef, selected);
-};
-</script>
+    // Optional: alle 5 Sekunden nach Updates prüfen
+    setInterval(loadOwner, 5000);
+  </script>
 </body>
 </html>
-```
