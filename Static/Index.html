@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartenbesitzer Live</title>
+<style>
+body { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:Arial,sans-serif; background:#f0f0f0;}
+.card { background:white; padding:40px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); text-align:center; font-size:2rem; margin-bottom:20px;}
+select, button { padding:10px 20px; font-size:1rem; border-radius:8px; cursor:pointer; margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="card">
+Aktueller Kartenbesitzer: <strong id="owner-name">-</strong>
+</div>
+
+<select id="new-owner">
+  <option value="Semmel">Semmel</option>
+  <option value="Emmel">Emmel</option>
+  <option value="Bemmel">Bemmel</option>
+  <option value="Jemmel">Jemmel</option>
+</select>
+<button onclick="updateOwner()">Besitzer ändern</button>
+
+<script>
+const ownerName = document.getElementById('owner-name');
+const select = document.getElementById('new-owner');
+
+async function loadOwner() {
+  try {
+    const res = await fetch('/owner');
+    const data = await res.json();
+    ownerName.textContent = data.owner;
+    select.value = data.owner;
+  } catch(e){ console.error(e); }
+}
+
+async function updateOwner() {
+  const newOwner = select.value;
+  await fetch('/owner', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ owner: newOwner })
+  });
+  ownerName.textContent = newOwner;
+}
+
+// Live-Update alle 5 Sekunden
+loadOwner();
+setInterval(loadOwner, 5000);
+</script>
+
+</body>
+</html>
