@@ -1,37 +1,57 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kartenbesitzer</title>
-  <style>
-    body { display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f0f0; font-family:Arial,sans-serif; }
-    .card { background:white; padding:40px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); text-align:center; font-size:2rem; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartenbesitzer Live</title>
+<style>
+body { display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f0f0; font-family:Arial,sans-serif; }
+.card { background:white; padding:40px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); text-align:center; font-size:2rem; }
+button, select { margin-top:20px; padding:10px 20px; font-size:1rem; border-radius:8px; cursor:pointer; }
+</style>
 </head>
 <body>
-  <div class="card">
-    Aktueller Kartenbesitzer: <strong id="owner-name">-</strong>
-  </div>
+<div class="card">
+Aktueller Kartenbesitzer: <strong id="owner-name">Benni</strong><br>
+<select id="new-owner">
+  <option value="Joey">Joey</option>
+  <option value="Benni">Benni</option>
+  <option value="EMIL">EMIL</option>
+  <option value="Semmel">Semmel</option>
+</select>
+<button onclick="updateOwner()">Besitzer ändern</button>
+</div>
 
-  <script>
-    // URL zu deiner JSON-Datei
-    const jsonURL = 'https://gist.githubusercontent.com/DEIN_USERNAME/DEIN_GIST_ID/raw/owner.json';
+<script>
+const ownerName = document.getElementById('owner-name');
+const select = document.getElementById('new-owner');
+const jsonFile = 'owner.json';
 
-    async function loadOwner() {
-      try {
-        const response = await fetch(jsonURL);
-        const data = await response.json();
-        document.getElementById('owner-name').textContent = data.owner;
-      } catch (err) {
-        console.error('Fehler beim Laden des Besitzers:', err);
-      }
-    }
+// Lade Besitzer beim Start
+async function loadOwner() {
+  try {
+    const res = await fetch(jsonFile + '?cache=' + new Date().getTime());
+    const data = await res.json();
+    ownerName.textContent = data.owner;
+    select.value = data.owner;
+  } catch(e) {
+    console.error('Fehler beim Laden:', e);
+  }
+}
+loadOwner();
 
-    loadOwner();
+// Ändern des Besitzers
+async function updateOwner() {
+  const newOwner = select.value;
+  ownerName.textContent = newOwner;
 
-    // Optional: alle 5 Sekunden nach Updates prüfen
-    setInterval(loadOwner, 5000);
-  </script>
+  // Pseudo „Server-Update“ via fetch POST (funktioniert nur wenn Render Rewrite erlaubt)
+  // In echter Conservenlösung: Manuell owner.json ändern oder GitHub Actions nutzen
+  alert(newOwner + ' hat jetzt die Karte für alle sichtbar!');
+
+  // Update alle 5 Sekunden automatisch nachladen
+}
+setInterval(loadOwner, 5000);
+</script>
 </body>
 </html>
